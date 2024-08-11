@@ -1,0 +1,80 @@
+[01-Jun-2024 19:48:20 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Broadcast" not found in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/channels.php:16
+Stack trace:
+#0 {main}
+  thrown in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/channels.php on line 16
+[01-Jun-2024 19:48:20 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Broadcast" not found in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/channels.php:16
+Stack trace:
+#0 {main}
+  thrown in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/channels.php on line 16
+[01-Jun-2024 19:48:20 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/auth.php:14
+Stack trace:
+#0 {main}
+  thrown in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/auth.php on line 14
+[01-Jun-2024 19:48:20 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Broadcast" not found in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/channels.php:16
+Stack trace:
+#0 {main}
+  thrown in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/channels.php on line 16
+[01-Jun-2024 19:48:20 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/auth.php:14
+Stack trace:
+#0 {main}
+  thrown in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/auth.php on line 14
+[01-Jun-2024 19:48:20 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/api.php:17
+Stack trace:
+#0 {main}
+  thrown in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/api.php on line 17
+[01-Jun-2024 19:48:20 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/auth.php:14
+Stack trace:
+#0 {main}
+  thrown in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/auth.php on line 14
+[01-Jun-2024 19:48:20 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/api.php:17
+Stack trace:
+#0 {main}
+  thrown in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/api.php on line 17
+[01-Jun-2024 19:48:20 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Artisan" not found in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/console.php:17
+Stack trace:
+#0 {main}
+  thrown in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/console.php on line 17
+[01-Jun-2024 19:48:20 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Artisan" not found in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/console.php:17
+Stack trace:
+#0 {main}
+  thrown in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/console.php on line 17
+[01-Jun-2024 19:48:21 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/api.php:17
+Stack trace:
+#0 {main}
+  thrown in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/api.php on line 17
+[01-Jun-2024 19:48:21 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/api.php:17
+Stack trace:
+#0 {main}
+  thrown in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/api.php on line 17
+[01-Jun-2024 19:48:21 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Artisan" not found in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/console.php:17
+Stack trace:
+#0 {main}
+  thrown in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/console.php on line 17
+[01-Jun-2024 19:48:21 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Broadcast" not found in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/channels.php:16
+Stack trace:
+#0 {main}
+  thrown in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/channels.php on line 16
+[01-Jun-2024 19:48:21 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/auth.php:14
+Stack trace:
+#0 {main}
+  thrown in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/auth.php on line 14
+[01-Jun-2024 19:48:22 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/auth.php:14
+Stack trace:
+#0 {main}
+  thrown in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/auth.php on line 14
+[01-Jun-2024 19:48:22 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Artisan" not found in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/console.php:17
+Stack trace:
+#0 {main}
+  thrown in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/console.php on line 17
+[01-Jun-2024 19:48:23 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Artisan" not found in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/console.php:17
+Stack trace:
+#0 {main}
+  thrown in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/console.php on line 17
+[01-Jun-2024 19:48:24 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Route" not found in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/api.php:17
+Stack trace:
+#0 {main}
+  thrown in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/api.php on line 17
+[01-Jun-2024 19:48:24 UTC] PHP Fatal error:  Uncaught Error: Class "Illuminate\Support\Facades\Broadcast" not found in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/channels.php:16
+Stack trace:
+#0 {main}
+  thrown in /home4/wahatald/aldvan-latest.wahat-al-dhaid.com/routes/channels.php on line 16
