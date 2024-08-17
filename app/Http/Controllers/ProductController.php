@@ -1576,7 +1576,7 @@ class ProductController extends Controller
                             if($status->id >= $product->log_status){
                                 $html .= '<option data-description="' . htmlspecialchars($status->description) . '" value="' . htmlspecialchars($status->id) . '" ' . $selected . '>' . htmlspecialchars($status->name) . '</option>';
                             }
-                                
+
                         }
                     }
                     $html .= '</select>';
@@ -1589,8 +1589,8 @@ class ProductController extends Controller
                                     <option data-description="N/A" value="" '.($product->lc == "" || $product->lc == null ? 'selected' : "") .'>N/A</option>';
 
                     foreach($this->lc as $key => $value)
-                    { 
-    
+                    {
+
                         $html .= '<option data-description="' . htmlspecialchars($UserName) . '" value="'.$key.'" '. ($product->lc == $key ? "selected" : "") . ' >'.$value.'</option>';
                     }
                     $html .= '</select>';
@@ -1808,12 +1808,14 @@ class ProductController extends Controller
     {
         $product = Product::find($id);
 
-        if (!$product) {
+        if (!$product)
+        {
             return response()->json(['status' => 'error', 'message' => 'Product not found on this option'], 404);
         }
 
         // Check if the product can be updated
-        if ($product->changed_by === null) {
+        if ($product->changed_by === null)
+        {
 
             $className = $request->input('className');
             //dd($className);
@@ -1826,7 +1828,7 @@ class ProductController extends Controller
             else if($className === "editable-ntf_cs"){
                 $product->changed_by_ntf_cs = auth()->id(); // Store the user ID
             }
-            
+
             $product->save();
 
             return response()->json(['status' => 'success', 'message' => 'Option updated']);
@@ -1845,7 +1847,7 @@ class ProductController extends Controller
         if (!$user) {
             return 'User not found';
         }
-        return  $user->name; 
+        return  $user->name;
     }
     public function getProductUserNameCost($productId)
     {
@@ -1857,7 +1859,7 @@ class ProductController extends Controller
         if (!$user) {
             return "N/A";
         }
-        return  $user->name; 
+        return  $user->name;
     }
     public function getProductUserNameNTF_CS($productId)
     {
@@ -1869,8 +1871,8 @@ class ProductController extends Controller
         if (!$user) {
             return "N/A";
         }
-        return  $user->name; 
+        return  $user->name;
     }
-    
+
 
 }

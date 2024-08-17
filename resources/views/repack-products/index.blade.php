@@ -26,6 +26,8 @@
                 /* Preventing content from wrapping */
             }
 
+           
+
 
             .barcode-container:hover .popup {
                 display: block;
@@ -51,6 +53,7 @@
                                 <th>CSDID</th>
                                 <th>MAITOU</th>
                                 <th>BillId</th>
+                                <th>CT ID</th>
                                 <th>P.Name</th>
                                 <th>P.</th>
                                 <th>P.</th>
@@ -69,7 +72,6 @@
                                 <th>T.Cube</th>
                                 <th>Date/Time</th>
                                 <th>Remark</th>
-                                <th>CT ID</th>
                                 <th>Log Status</th>
                                 <th>LC</th>
                                 <th>Print</th>
@@ -248,8 +250,7 @@
         </div>
     </div>
 
-    <div id="popup_status"
-    style="display: none; position: absolute; background-color: #f9f9f9; border: 1px solid #ccc; padding: 10px;">
+<div id="popup_status" style="display: none; position: absolute; background-color: #f9f9f9; border: 1px solid #ccc; padding: 10px;">>
 </div>
 <div id="popup" style="display:none; position:absolute; background-color:#fff; border:1px solid #ccc; padding:5px;">
         <p id="popup-content"></p>
@@ -272,90 +273,115 @@
 
         <script>
             $(document).ready(function() {
-
+                checkStatusAndStartCountdown();
                 function startCountdown(startTime, row) {
-        var countdownInterval = setInterval(function () {
-            var currentTime = serverTimeDate;
-            var elapsedTime = currentTime - startTime;
-            var days = Math.floor(elapsedTime / (1000 * 60 * 60 * 24));
-            var hours = Math.floor((elapsedTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            var minutes = Math.floor((elapsedTime % (1000 * 60 * 60)) / (1000 * 60));
-            var seconds = Math.floor((elapsedTime % (1000 * 60)) / 1000);
-            var countdownString = days + "D " + hours.toString().padStart(2, '0') + ":" + minutes.toString().padStart(2, '0') + ":" + seconds.toString().padStart(2, '0');
-            //  console.log(countdownString , row);
-            row.querySelector('.dbttime').textContent = countdownString;
+                    var countdownInterval = setInterval(function () {
+                        var currentTime = serverTimeDate;
+                        var elapsedTime = currentTime - startTime;
+                        var days = Math.floor(elapsedTime / (1000 * 60 * 60 * 24));
+                        var hours = Math.floor((elapsedTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        var minutes = Math.floor((elapsedTime % (1000 * 60 * 60)) / (1000 * 60));
+                        var seconds = Math.floor((elapsedTime % (1000 * 60)) / 1000);
+                        var countdownString = days + "D " + hours.toString().padStart(2, '0') + ":" + minutes.toString().padStart(2, '0') + ":" + seconds.toString().padStart(2, '0');
+                        //  console.log(countdownString , row);
+                        row.querySelector('.dbttime').textContent = countdownString;
 
-        }, 1000);
-    }
-function stopWatch()
-  {
-    var rowsForCountDown = document.querySelectorAll('tbody.main-table tr');
-    console.log(rowsForCountDown);
-    rowsForCountDown.forEach(function (row, index) {
-        var startTime = row.querySelector('.dbttime');
+                    }, 1000);
+                }
+                function stopWatch()
+                {
+                    var rowsForCountDown = document.querySelectorAll('tbody.main-table tr');
+                    console.log(rowsForCountDown);
+                    rowsForCountDown.forEach(function (row, index) {
+                        var startTime = row.querySelector('.dbttime');
 
-        if (startTime != null) {
-            var startTimeStr = startTime.textContent;
-            if (startTimeStr.startsWith('Started:')) {
+                        if (startTime != null) {
+                            var startTimeStr = startTime.textContent;
+                            if (startTimeStr.startsWith('Started:')) {
 
-                var startTime = new Date(startTimeStr.replace('Started: ', ''));
+                                var startTime = new Date(startTimeStr.replace('Started: ', ''));
 
 
-                startCountdown(startTime, row);
-            }
-        }
+                                startCountdown(startTime, row);
+                            }
+                        }
 
-    });
-  }
+                    });
+                }
 
-  // Event listener for log status selection
-    $(document).ready(function() {
-        $('.editable-log_status').on('change', function() {
-            var selectedValue = $(this).val();
-            var $row = $(this).closest('tr'); // Assuming the row is the closest parent <tr> element
+ 
+                // Function to check and start countdown based on status
+                function checkStatusAndStartCountdown() {
+                    $('#dataTable').find('.editable-log_status').each(function() {
+                        var status = $(this).data('status');
+                        if (status == 6 || status == 15) {
+                            var $row = $(this).closest('tr');
+                            var dbtCell = $row.find('.dbttime');
+                            startCountdown(dbtCell,$row);
+                        }
+                    });
+                }
 
-            // Clear any existing countdown interval
-            if ($row.data('countdownIntervalId')) {
-                clearInterval($row.data('countdownIntervalId'));
-                $row.removeData('countdownIntervalId');
-            }
+                // Event listener for status changes
+                $('#dataTable').on('change', '.editable-log_status', function () {
+                    var status = $(this).data('status');
+                    if (status == 6 || status == 15) {
+                        var $row = $(this).closest('tr');
+                        var dbtCell = $row.find('.dbttime');
+                        startCountdown(dbtCell,$row);
+                    }
+                });
 
-            // Check if the selected value requires starting the countdown
-            if (selectedValue === '6' || selectedValue === '15') {
-                var startTime = new Date().getTime(); // Use current time as start time
-                startCountdown(startTime, $row);
-            }
-        });
-        var selectedValue = $("editable-log_status").val();
-        if (selectedValue === '6' || selectedValue === '15') {
-            var startTime = new Date().getTime(); // Use current time as start time
-            startCountdown(startTime, $row);
-        }
-    });
-
-  var table = $('#dataTable').DataTable({
+                var table = $('#dataTable').DataTable({
                     "pageLength": 50,
                     "lengthMenu": [[50, 100, 150, 200, -1], [50, 100, 150, 200, "All"]],
                     processing: true,
                     serverSide: true,
                     ajax: '{{ route("repackProductsData") }}',
                     'fnRowCallback': function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                        // Make remarks column editable
                         $(nRow).find('td').eq(21).attr('contenteditable', true);
                         $(nRow).find('td').eq(21).addClass('editable-remarks');
                         $(nRow).find('td').eq(21).attr('data-id', $(nRow).find('td').find('.product-id').val());
-                        let checkbox = 'unchecked';
-                        if ($('#checkAll').prop('checked')) {
-                        checkbox = 'checked'
-                        } else {
-                        checkbox = 'unchecked';
-                        }
+
+                        // Update checkbox state
+                        let checkbox = $('#checkAll').prop('checked') ? 'checked' : 'unchecked';
                         $(nRow).find("input[type=checkbox]").prop(checkbox, aData.checkbox);
+
+                        // Determine row index
+                        let rowIndex = $(nRow).index();
+
+                        // Hide L, W, H data for non-first rows in a pair
+                        // if (rowIndex % 2 === 0) {
+                        //     // First row in the pair, show L, W, H data
+                        //     $(nRow).find('td').eq(18).show(); // Length
+                        //     $(nRow).find('td').eq(19).show(); // Width
+                        //     $(nRow).find('td').eq(20).show(); // Height
+                        // } else {
+                        //     // Second row in the pair, hide L, W, H data
+                        //     $(nRow).find('td').eq(18).hide();
+                        //     $(nRow).find('td').eq(19).hide();
+                        //     $(nRow).find('td').eq(20).hide();
+                        // }
                     },
                     columns: [
                         { data: 'checkbox', name: 'checkbox' },
                         { data: 'csd_id', name: 'csd_id' },
                         { data: 'maitou', name: 'maitou' },
-                        { data: 'bill_id', name: 'bill_id'},
+                        {
+                            data: 'bill_id',
+                            name: 'bill_id',
+                            render: function(data, type, full, meta) {
+                                if (data) {
+                                    var url = '{{ route('products.index', ['bill_id' => 'BillParam']) }}';
+                                    url = url.replace('BillParam', data);
+                                    return '<a href="' + url + '">' + data + '</a>';
+                                } else {
+                                    return '';
+                                }
+                            }
+                        },
+                        { data: 'ct_id', name: 'ct_id'},
                         { data: 'product_name', name: 'product_name'},
                         { data: 'photo1', name: 'photo1'},
                         { data: 'photo2', name: 'photo2'},
@@ -363,34 +389,28 @@ function stopWatch()
                         { data: 'photo4', name: 'photo4'},
                         { data: 'sku', name: 'sku'},
                         { data: 'warehouse', name: 'warehouse',
-                            render: function(data, type, full, meta)
-                            {
-                                if(data == '义乌')
-                                {
-                                return '<span style="color:red">' + data + '</span>';
-                                }
-                                else if(data == '广州'){
-                                return '<span style="color:green">' + data + '</span>';
-                                }
-                                else if(data ==  '深圳')
-                                {
-                                return '<span style="color:blue">' + data + '</span>';
+                            render: function(data, type, full, meta) {
+                                if (data == '义乌') {
+                                    return '<span style="color:red">' + data + '</span>';
+                                } else if (data == '广州') {
+                                    return '<span style="color:green">' + data + '</span>';
+                                } else if (data == '深圳') {
+                                    return '<span style="color:blue">' + data + '</span>';
                                 }
                                 return '';
                             }
                         },
                         { data: 'option', name: 'option',
-                        render: function(data, type, full, meta) {
+                            render: function(data, type, full, meta) {
                                 let imageUrl = '';
-                                if(data == 'SEA') {
+                                if (data == 'SEA') {
                                     imageUrl = '{{ asset("assets/images/icons/sea.jpeg") }}';
-                                } else if(data == 'EK') {
+                                } else if (data == 'EK') {
                                     imageUrl = '{{ asset("assets/images/icons/ek.jpeg") }}';
-                                } else if(data == 'AIR') {
+                                } else if (data == 'AIR') {
                                     imageUrl = '{{ asset("assets/images/icons/air.jpeg") }}';
                                 }
-
-                                if(imageUrl) {
+                                if (imageUrl) {
                                     return '<img src="' + imageUrl + '" class="image-option">';
                                 }
                                 return '';
@@ -406,7 +426,6 @@ function stopWatch()
                         { data: 't_cube', name: 't_cube'},
                         { data: 'created_at', name: 'created_at'},
                         { data: 'remarks', name: 'remarks'},
-                        { data: 'ct_id', name: 'ct_id'},
                         { data: 'log_status', name: 'log_status'},
                         { data: 'lc', name: 'lc'},
                         { data: 'print', name: 'print'},
@@ -416,16 +435,41 @@ function stopWatch()
                         { data: 'paisong_siji', name: 'paisong_siji'},
                         { data: 'survey', name: 'survey'},
                         { data: 'hidden_fields', name: 'hidden_fields'},
-
                     ]
                 });
 
+                // Ensure that L, W, H columns are updated correctly after table draw
                 table.on('draw.dt', function() {
-                stopWatch();
+                    toggleLengthWidthHeight();
+                    stopWatch();
+                });
+
+                 // Function to toggle the visibility of L, W, H columns
+                function toggleLengthWidthHeight() {
+                    var columnLength = table.column(18);
+                    var columnWidth = table.column(19);
+                    var columnHeight = table.column(20);
+
+                    $('#dataTable tbody tr').each(function(index) {
+                        if (index % 2 === 0) {
+                            // First row in the pair, show L, W, H data
+                            columnLength.visible(true);
+                            columnWidth.visible(true);
+                            columnHeight.visible(true);
+                        } else {
+                            // Second row in the pair, hide L, W, H data
+                            columnLength.visible(false);
+                            columnWidth.visible(false);
+                            columnHeight.visible(false);
+                        }
+                    });
+                }
+                
+                toggleLengthWidthHeight();
 
             });
 
-            });
+           
 
             $(document).on('click', '.view-image', function() {
             $('#imageModal img').attr('src', '');
@@ -441,6 +485,8 @@ function stopWatch()
                 }
             });
          });
+
+
 
          function copyProducts(text) {
           const textArea = document.createElement("textarea");
