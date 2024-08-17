@@ -21,7 +21,7 @@
                             <x-text-input id="MAITOU" type="text" name="MAITOU" :value="old('MAITOU', $customer->MAITOU)" autofocus autocomplete="off" placeholder="MAITOU" />
                         </div>
                         <div class="col-lg-4 col-sm-12 col-md-4">
-                            <x-text-input id="CS" type="text" name="CS DID" :value="old('CS', $customer->CS)" autofocus autocomplete="off" placeholder="CS DID" />
+                            <x-text-input id="CS" type="text" name="CS" :value="old('CS', $customer->CS)" autofocus autocomplete="off" placeholder="CS DID" />
                         </div>
                         {{-- <div class="col-lg-4 col-sm-12 col-md-4">
                             <x-text-input id="DID" type="text" name="DID" :value="old('DID', $customer->DID)" autofocus autocomplete="off" placeholder="DID" />

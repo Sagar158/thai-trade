@@ -11,6 +11,7 @@ use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CustomersController;
 use App\Http\Controllers\LogStatusController;
 use App\Http\Controllers\RepackDeleteController;
+use App\Http\Controllers\OptionController;
 
 /*
 |--------------------------------------------------------------------------
@@ -82,6 +83,8 @@ Route::middleware('auth')->group(function () {
             });
 
             Route::post('/product-image/{id}/{attribute}', [ProductController::class, 'updateProductImage']);
+            Route::post('/update-option/{id}', [ProductController::class, 'updateProduct']);
+            Route::get('/get-logs-status/{id}', [ProductController::class, 'getLogsStatus']);
             Route::get('/CKW-C2T', 'CKW_C2T');
             Route::get('/bko-c2t', 'CKW_C2T')->name('CKW_C2T');
             Route::get('/bko-c2t/data', 'CKWC2TData')->name('CKW_C2T.data');

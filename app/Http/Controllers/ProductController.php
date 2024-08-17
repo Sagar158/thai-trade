@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Product;
+use App\Models\User;
 use App\Models\LogStatus;
 use App\Helpers\Helper;
 use Illuminate\Http\Request;
@@ -919,7 +920,7 @@ class ProductController extends Controller
         return view('bkw-c2t.index', compact('logStatus','ct_ids','title','lcs'));
     }
 
-    public function getLogsStatus($id)
+    public function getLogsStatus_old($id)
     {
         $products = RepackProduct::where('ct_id', $id)->orderBy('id', 'desc')->get();
         $html = '';
@@ -944,6 +945,50 @@ class ProductController extends Controller
         return $html;
     }
 
+    public function getLogsStatus($id)
+    {
+        // Fetch products associated with the CT ID
+        $products = RepackProduct::where('ct_id', $id)->orderBy('id', 'desc')->get();
+
+        // Fetch all log statuses
+        $logStatus = LogStatus::get();
+
+        // Initialize HTML and a set for tracking unique statuses
+        $html = '';
+        $seenStatuses = [];
+
+        // Determine the current status from the first product (assuming the latest product is representative)
+        $currentStatus = $products->count() > 0 ? $products->first()->log_status : null;
+
+        foreach ($products as $product) {
+            if ($product->option == 'EK') {
+                // Filter EK status options
+                $statusOptions = array_filter($logStatus->toArray(), function ($status) use ($currentStatus) {
+                    return in_array($status['name'], $this->ekarray) && $status['id'] >= $currentStatus;
+                });
+            } elseif ($product->option == 'SEA') {
+                // Filter SEA status options
+                $statusOptions = array_filter($logStatus->toArray(), function ($status) use ($currentStatus) {
+                    return in_array($status['name'], $this->seaarray) && $status['id'] >= $currentStatus;
+                });
+            } else {
+                // Default case (if needed)
+                $statusOptions = array_filter($logStatus->toArray(), function ($status) use ($currentStatus) {
+                    return $status['id'] >= $currentStatus;
+                });
+            }
+
+            foreach ($statusOptions as $status) {
+                // Check if this status has already been added
+                if (!isset($seenStatuses[$status['id']])) {
+                    $seenStatuses[$status['id']] = true; // Mark this status as seen
+                    $html .= '<option data-description="' . htmlspecialchars($status['description']) . '" value="' . htmlspecialchars($status['id']) . '">' . htmlspecialchars($status['name']) . '</option>';
+                }
+            }
+        }
+
+        return $html;
+    }
     public function bkwc2tData(Request $request)
     {
         $products = RepackProduct::with(['customer'])->orderBy('id', 'desc');
@@ -970,7 +1015,7 @@ class ProductController extends Controller
         ->addColumn('log_status', function($product){
 
              $logStatus = LogStatus::get();
-
+             $currentStatus = $product->log_status;
              $html = '
                      <select class="editable-log_status" data-id="'. $product->id .'">
                          <option data-description="" value="" '.( $product->log_status == "" || $product->log_status == null ? 'selected' : "") .' >N/A</option>';
@@ -993,45 +1038,54 @@ class ProductController extends Controller
                  }
                  else
                  {
-                     $selected = ($product->log_status == $status->id) ? 'selected' : '';
-                     $html .= '<option data-description="' . htmlspecialchars($status->description) . '" value="' . htmlspecialchars($status->id) . '" ' . $selected . '>' . htmlspecialchars($status->name) . '</option>';
+
+                    if ($product->log_status >= $status->id) {
+                        $selected = ($currentStatus == $status->id) ? 'selected' : '';
+                        $html .= '<option data-description="' . htmlspecialchars($status->description) . '" value="' . htmlspecialchars($status->id) . '" ' . $selected . '>' . htmlspecialchars($status->name) . '</option>';
+                    }
                  }
              }
              $html .= '</select>';
              return $html;
          })
          ->addColumn('lc', function($product){
+            $UserName = $this->getProductUserNameLC($product->id);
              $html = '
                          <select class="editable-lc" data-id="'. $product->id .'">
-                             <option value="" '.($product->lc == "" || $product->lc == null ? 'selected' : "") .'>N/A</option>
+                             <option data-description="N/A" value="" '.($product->lc == "" || $product->lc == null ? 'selected' : "") .'>N/A</option>
                     ';
 
             foreach($this->lc as $key => $value)
             {
-                $html .= '<option value="'.$key.'" '. ($product->lc == $key ? "selected" : "") .'>'.$value.'</option>';
+                $html .= '<option data-description="' . htmlspecialchars($UserName) . '" value="'.$key.'" '. ($product->lc == $key ? "selected" : "") .'>'.$value.'</option>';
             }
 
             $html .= '</select>';
              return $html;
          })
          ->addColumn('print', function($product){
+            if($product->print !== null){
+                $product->changed_by_print = auth()->id();
+            }
              return $product->print == null ? 'Not Printed' : 'Printed';
          })
          ->addColumn('cost', function($product){
+            $UserName = $this->getProductUserNameCost($product->id);
              $html = '
                      <select class="editable-cost" data-id="'. $product->id .'">
-                         <option value="No" '.($product->cost == 'No' || $product->cost == null ? 'selected' : '') .'>No</option>
-                         <option value="Yes" '. ($product->cost == 'Yes' ? 'selected' : '') .'>Yes</option>
+                         <option data-description="' . htmlspecialchars($UserName) . '" value="No" '.($product->cost == 'No' || $product->cost == null ? 'selected' : '') .'>No</option>
+                         <option data-description="' . htmlspecialchars($UserName) . '" value="Yes" '. ($product->cost == 'Yes' ? 'selected' : '') .'>Yes</option>
                      </select>
              ';
 
              return $html;
          })
          ->addColumn('ntf_cs', function($product){
+            $UserName = $this->getProductUserNameNTF_CS($product->id);
              $html = '
                          <select class="editable-ntf_cs" data-id="'. $product->id .'">
-                             <option value="No" '.($product->ntf_cs == 'No' || $product->ntf_cs == null ? 'selected' : '') .'>No</option>
-                             <option value="Yes" '. ($product->ntf_cs == 'Yes' ? 'selected' : '') .'>Yes</option>
+                             <option data-description="' . htmlspecialchars($UserName) . '" value="No" '.($product->ntf_cs == 'No' || $product->ntf_cs == null ? 'selected' : '') .'>No</option>
+                             <option data-description="' . htmlspecialchars($UserName) . '" value="Yes" '. ($product->ntf_cs == 'Yes' ? 'selected' : '') .'>Yes</option>
                          </select>
                      ';
 
@@ -1040,7 +1094,7 @@ class ProductController extends Controller
          ->addColumn('dbt', function($product){
             $html = '';
             if ($product->dbt == null || $product->dbt == '') {
-                $html .='<button class="editable-dbt" data-id="' . htmlspecialchars($product->id) . '">Start</button>';
+                $html .='<button class="btn btn-primary editable-dbt" data-id="' . htmlspecialchars($product->id) . '">Start</button>';
             } else {
                 $modifiedString = preg_replace('/(\d+)d/', '$1D', $product->dbt);
                 $html .='<p class="dbttime">' . htmlspecialchars($modifiedString ?? $product->dbt) . '</p>';
@@ -1502,33 +1556,42 @@ class ProductController extends Controller
                             if (in_array($status->name, $this->ekarray))
                             {
                                 $selected = ($product->log_status == $status->id) ? 'selected' : '';
-                                $html .= '<option data-description="' . htmlspecialchars($status->description) .'" value="' . htmlspecialchars($status->id) . '" ' . $selected . '>' .htmlspecialchars($status->name) . '</option>';
+                                if($status->id >= $product->log_status){
+                                    $html .= '<option data-description="' . htmlspecialchars($status->description) . '" value="' . htmlspecialchars($status->id) . '" ' . $selected . '>' . htmlspecialchars($status->name) . '</option>';
+                                }
                             }
                         }
                         elseif ($product->option == 'SEA')
                         {
                             if (in_array($status->name, $this->seaarray)) {
                                 $selected = ($product->log_status == $status->id) ? 'selected' : '';
-                                $html .= '<option data-description="' . htmlspecialchars($status->description) . '" value="' . htmlspecialchars($status->id) . '" ' . $selected . '>' . htmlspecialchars($status->name) . '</option>';
+                                if($status->id >= $product->log_status){
+                                    $html .= '<option data-description="' . htmlspecialchars($status->description) . '" value="' . htmlspecialchars($status->id) . '" ' . $selected . '>' . htmlspecialchars($status->name) . '</option>';
+                                }
                             }
                         }
                         else
                         {
                             $selected = ($product->log_status == $status->id) ? 'selected' : '';
-                            $html .= '<option data-description="' . htmlspecialchars($status->description) . '" value="' . htmlspecialchars($status->id) . '" ' . $selected . '>' . htmlspecialchars($status->name) . '</option>';
+                            if($status->id >= $product->log_status){
+                                $html .= '<option data-description="' . htmlspecialchars($status->description) . '" value="' . htmlspecialchars($status->id) . '" ' . $selected . '>' . htmlspecialchars($status->name) . '</option>';
+                            }
+                                
                         }
                     }
                     $html .= '</select>';
                     return $html;
                 })
                 ->addColumn('lc', function($product){
+                    $UserName = $this->getProductUserNameLC($product->id);
                     $html = '
                                 <select class="editable-lc" data-id="'. $product->id .'">
-                                    <option value="" '.($product->lc == "" || $product->lc == null ? 'selected' : "") .'>N/A</option>';
+                                    <option data-description="N/A" value="" '.($product->lc == "" || $product->lc == null ? 'selected' : "") .'>N/A</option>';
 
                     foreach($this->lc as $key => $value)
-                    {
-                        $html .= '<option value="'.$key.'" '. ($product->lc == $key ? "selected" : "") .'>'.$value.'</option>';
+                    { 
+    
+                        $html .= '<option data-description="' . htmlspecialchars($UserName) . '" value="'.$key.'" '. ($product->lc == $key ? "selected" : "") . ' >'.$value.'</option>';
                     }
                     $html .= '</select>';
                     return $html;
@@ -1537,10 +1600,11 @@ class ProductController extends Controller
                     return $product->print == null ? 'Not Printed' : 'Printed';
                 })
                 ->addColumn('cost', function($product){
+                    $UserName = $this->getProductUserNameCost($product->id);
                     $html = '
                             <select class="editable-cost" data-id="'. $product->id .'">
-                                <option value="No" '.($product->cost == 'No' || $product->cost == null ? 'selected' : '') .'>No</option>
-                                <option value="Yes" '. ($product->cost == 'Yes' ? 'selected' : '') .'>Yes</option>
+                                <option data-description="' . htmlspecialchars($UserName) . '" value="No" '.($product->cost == 'No' || $product->cost == null ? 'selected' : '') .'>No</option>
+                                <option data-description="' . htmlspecialchars($UserName) . '" value="Yes" '. ($product->cost == 'Yes' ? 'selected' : '') .'>Yes</option>
                             </select>
                     ';
 
@@ -1557,10 +1621,11 @@ class ProductController extends Controller
                     return $html;
                 })
                 ->addColumn('ntf_cs', function($product){
+                    $UserName = $this->getProductUserNameNTF_CS($product->id);
                     $html = '
                                 <select class="editable-ntf_cs" data-id="'. $product->id .'">
-                                    <option value="No" '.($product->ntf_cs == 'No' || $product->ntf_cs == null ? 'selected' : '') .'>No</option>
-                                    <option value="Yes" '. ($product->ntf_cs == 'Yes' ? 'selected' : '') .'>Yes</option>
+                                    <option data-description="' . htmlspecialchars($UserName) . '" value="No" '.($product->ntf_cs == 'No' || $product->ntf_cs == null ? 'selected' : '') .'>No</option>
+                                    <option data-description="' . htmlspecialchars($UserName) . '" value="Yes" '. ($product->ntf_cs == 'Yes' ? 'selected' : '') .'>Yes</option>
                                 </select>
                             ';
 
@@ -1589,6 +1654,9 @@ class ProductController extends Controller
                     return $html;
                 })
                 ->addColumn('hidden_fields', function($product){
+                    if($product->print !== null){
+                        $product->changed_by_print = auth()->id();
+                    }
                   return '
                         <input type="hidden" class="product-id" value="' . $product->id . '">
                         <input type="hidden" class="product-code" value="' . $product->product_id . '">
@@ -1602,6 +1670,8 @@ class ProductController extends Controller
                         <input type="hidden" class="option" value="' . $product->option . '">
                         <input type="hidden" class="type" value="' . $product->type . '">
                         <input type="hidden" class="warehouse" value="' . $product->warehouse . '">
+                        <input type="hidden" class="changed_by_print" value="' . $product->changed_by_print . '">
+
                   ';
                 })
                ->rawColumns(['checkbox','sku','photo1','photo2','photo3','photo4','log_status','lc','cost','survey','paisong_siji','ntf_cs','dbt', 'hidden_fields'])
@@ -1733,4 +1803,74 @@ class ProductController extends Controller
         return response()->json(['message' => "Product $attribute updated successfully", 'image' => $product[$attribute]]);
 
     }
+
+    public function updateProduct(Request $request, $id)
+    {
+        $product = Product::find($id);
+
+        if (!$product) {
+            return response()->json(['status' => 'error', 'message' => 'Product not found on this option'], 404);
+        }
+
+        // Check if the product can be updated
+        if ($product->changed_by === null) {
+
+            $className = $request->input('className');
+            //dd($className);
+            if($className === "editable-lc"){
+                $product->changed_by_lc = auth()->id(); // Store the user ID
+            }
+            else if($className === "editable-cost"){
+                $product->changed_by_cost = auth()->id(); // Store the user ID
+            }
+            else if($className === "editable-ntf_cs"){
+                $product->changed_by_ntf_cs = auth()->id(); // Store the user ID
+            }
+            
+            $product->save();
+
+            return response()->json(['status' => 'success', 'message' => 'Option updated']);
+        }
+
+        return response()->json(['status' => 'error', 'message' => 'Option cannot be changed again']);
+    }
+
+    public function getProductUserNameLC($productId)
+    {
+        $product = Product::find($productId);
+        if (!$product) {
+            return 'Product not found';
+        }
+        $user = User::find($product->changed_by_lc);
+        if (!$user) {
+            return 'User not found';
+        }
+        return  $user->name; 
+    }
+    public function getProductUserNameCost($productId)
+    {
+        $product = Product::find($productId);
+        if (!$product) {
+            return 'Product not found';
+        }
+        $user = User::find($product->changed_by_cost);
+        if (!$user) {
+            return "N/A";
+        }
+        return  $user->name; 
+    }
+    public function getProductUserNameNTF_CS($productId)
+    {
+        $product = Product::find($productId);
+        if (!$product) {
+            return 'Product not found';
+        }
+        $user = User::find($product->changed_by_ntf_cs);
+        if (!$user) {
+            return "N/A";
+        }
+        return  $user->name; 
+    }
+    
+
 }

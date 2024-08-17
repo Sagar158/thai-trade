@@ -37,16 +37,13 @@
         {{-- <x-right-side-button link="{{ route('department.create') }}" title="Create"></x-right-side-button> --}}
         <x-alert></x-alert>
         <div class="container-fluid card mt-3">
-            <div class="row card-body pb-0">
-                <div class="col-lg-12 col-sm-12 col-md-12">
-                <button class="btn btn-warning" id="productModalButton">Delete Product</button>
-                <button class="btn btn-secondary" id="updateCtIdButton">Update CT.ID</button>
-                <button class="btn btn-primary" id="printButton">Print</button>
-                </div>
-            </div>
             <div class="row card-body">
                 <div class="col-lg-12 col-sm-12 col-md-12">
-                    <div class="table-responsive">
+                    <button class="btn btn-warning" id="productModalButton">Delete Product</button>
+                    <button class="btn btn-secondary" id="updateCtIdButton">Update CT.ID</button>
+                    <button class="btn btn-primary" id="printButton">Print</button>
+                
+                    <div class="table-responsive pt-2">
                         <table id="dataTable" class="table">
                           <thead>
                             <tr>
@@ -254,7 +251,9 @@
     <div id="popup_status"
     style="display: none; position: absolute; background-color: #f9f9f9; border: 1px solid #ccc; padding: 10px;">
 </div>
-
+<div id="popup" style="display:none; position:absolute; background-color:#fff; border:1px solid #ccc; padding:5px;">
+        <p id="popup-content"></p>
+    </div>
 
     @push('scripts')
 
@@ -308,6 +307,31 @@ function stopWatch()
 
     });
   }
+
+  // Event listener for log status selection
+    $(document).ready(function() {
+        $('.editable-log_status').on('change', function() {
+            var selectedValue = $(this).val();
+            var $row = $(this).closest('tr'); // Assuming the row is the closest parent <tr> element
+
+            // Clear any existing countdown interval
+            if ($row.data('countdownIntervalId')) {
+                clearInterval($row.data('countdownIntervalId'));
+                $row.removeData('countdownIntervalId');
+            }
+
+            // Check if the selected value requires starting the countdown
+            if (selectedValue === '6' || selectedValue === '15') {
+                var startTime = new Date().getTime(); // Use current time as start time
+                startCountdown(startTime, $row);
+            }
+        });
+        var selectedValue = $("editable-log_status").val();
+        if (selectedValue === '6' || selectedValue === '15') {
+            var startTime = new Date().getTime(); // Use current time as start time
+            startCountdown(startTime, $row);
+        }
+    });
 
   var table = $('#dataTable').DataTable({
                     "pageLength": 50,
@@ -448,6 +472,69 @@ function stopWatch()
         function hidePopup() {
             $("#popup_status").css("display", "none");
         }
+
+            // Function to show popup
+            function showPopupLc(x, y, description) {
+
+                $('#popup').css({ top: y + 10, left: x + 10 }).show();
+                $('#popup-content').text(description);
+            }
+
+            // Function to hide popup
+            function hidePopupLc() {
+                $('#popup').hide();
+            }
+
+            // Event listener for hover
+            $(document).on('mouseenter', '.editable-lc, .editable-cost, .editable-ntf_cs', function(event) {
+            var $select = $(this);
+            var description = $select.find('option:selected').attr('data-description');
+            var x = event.clientX;
+            var y = event.clientY;
+            if(description !== "N/A"){
+                // Disable the drop-down and change its color
+                $select.prop('disabled', true);
+                $select.addClass('disabled-dropdown'); // Apply the disabled class
+                showPopupLc(x, y, description);
+            }
+
+            }).on('mouseleave', '.editable-lc', function() {
+                 hidePopupLc();
+            });
+
+
+
+
+            // Event listener for change
+            $(document).on('change', '.editable-lc, .editable-cost, .editable-ntf_cs', function() {
+                var $select = $(this); // The <select> element that triggered the event
+                var id = $select.data('id'); // Get the ID from data-id
+                var selectedValue = $select.val(); // Get the selected value
+                var classNameString = $(this).attr('class');
+                var loggedInUserId = @json(auth()->id());
+                var userId = loggedInUserId; // Ensure loggedInUserId is defined and holds the user ID
+
+                $.ajax({
+                    url: '/update-option/' + id,
+                    method: 'POST',
+                    data: {
+                        _token: $('meta[name="csrf-token"]').attr('content'),
+                        new_option: selectedValue, // Send the new option value
+                        user_id: userId, // Send the user ID
+                        className:classNameString
+                    },
+                    success: function(response) {
+                        // Disable the drop-down and change its color
+                        $select.prop('disabled', true);
+                        $select.addClass('disabled-dropdown'); // Apply the disabled class
+                    },
+                    error: function(xhr) {
+                        // Handle error
+                        console.error('An error occurred:', xhr.responseText);
+                        alert('An error occurred while updating the option.');
+                    }
+                });
+            });
 
          $(document).on('blur', '.editable-remarks', function () {
             var $this = $(this);

@@ -56,33 +56,39 @@ function calculateWeight() {
     var rows = document.querySelectorAll('tbody.main-table tr');
 
     rows.forEach(function (row, index) {
-        var w = parseFloat(document.getElementById('w' + index).innerText) || 0;
-        var l = parseFloat(document.getElementById('l' + index).innerText) || 0;
-        var h = parseFloat(document.getElementById('h' + index).innerText) || 0;
-        var tpcs = parseFloat(document.getElementById('tpcs' + index).innerText) || 0;
+        var wElem = document.getElementById('w' + index);
+        var lElem = document.getElementById('l' + index);
+        var hElem = document.getElementById('h' + index);
+        var tpcsElem = document.getElementById('tpcs' + index);
+        var calcResultElem = document.getElementById('calculationResult' + index);
+        var totalWeightResultElem = document.getElementById('totalWeightResult' + index);
+        var weightElem = document.getElementById('weight' + index);
+
+        var w = wElem ? parseFloat(wElem.innerText) || 0 : 0;
+        var l = lElem ? parseFloat(lElem.innerText) || 0 : 0;
+        var h = hElem ? parseFloat(hElem.innerText) || 0 : 0;
+        var tpcs = tpcsElem ? parseFloat(tpcsElem.innerText) || 0 : 0;
         var result = ((w * l * h) / 1000000) * tpcs;
 
-        var checktcube = parseFloat(document.getElementById('calculationResult' + index).innerText);
-        var checktWeght = parseFloat(document.getElementById('totalWeightResult' + index).innerText);
+        var checktcube = calcResultElem ? parseFloat(calcResultElem.innerText) : null;
+        var checktWeght = totalWeightResultElem ? parseFloat(totalWeightResultElem.innerText) : null;
 
-        
         if (!checktcube) {  // Check if data is empty or null
-            document.getElementById('calculationResult' + index).innerText = result.toFixed(2) || '0.0';
-
+            if (calcResultElem) {
+                calcResultElem.innerText = result.toFixed(2) || '0.0';
+            }
         } 
 
         if (!checktWeght) {  // Check if data is empty or null
-
-            var weight = parseFloat(document.getElementById('weight' + index).innerText) || 0;
+            var weight = weightElem ? parseFloat(weightElem.innerText) || 0 : 0;
             var totalWeight = weight * tpcs;
-            document.getElementById('totalWeightResult' + index).innerText = totalWeight || '0.0';
-    ;
-
+            if (totalWeightResultElem) {
+                totalWeightResultElem.innerText = totalWeight.toFixed(2) || '0.0';
+            }
         } 
-
-
     });
 }
+
 
 
 

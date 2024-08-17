@@ -54,6 +54,7 @@
                                     <th>CSDID</th>
                                     <th>MAITOU</th>
                                     <th>BillId</th>
+                                    <th>CT ID</th>
                                     <th>P.</th>
                                     <th>P.</th>
                                     <th>P.</th>
@@ -70,7 +71,6 @@
                                     <th>T.Cube</th>
                                     <th>Date/Time</th>
                                     <th>Remark</th>
-                                    <th>CT ID</th>
                                     <th>Log Status</th>
                                     <th>Print</th>
                                     <th>Cost</th>
@@ -307,6 +307,10 @@
                             }
                         },
                         {
+                            data: 'ct_id',
+                            name: 'ct_id'
+                        },
+                        {
                             data: 'photo1',
                             name: 'photo1'
                         },
@@ -405,10 +409,6 @@
                         {
                             data: 'remarks',
                             name: 'remarks'
-                        },
-                        {
-                            data: 'ct_id',
-                            name: 'ct_id'
                         },
                         {
                             data: 'log_status',

@@ -37,14 +37,12 @@
         <x-alert></x-alert>
         @php($product = \App\Models\RepackProduct::orderBy('id', 'desc')->first())
         <div class="container-fluid card mt-3">
-            <div class="row card-body pb-0">
-                <div class="col-lg-12 col-sm-12 col-md-12">
-                <button class="btn btn-secondary" id="updateCtIdButton">Update CT.ID</button>
-                <button class="btn btn-primary" id="printButton">Print</button>
+            <div class="row card-body pb-0 pt-0">
+                <div class="col-lg-3 col-sm-3 col-md-3 pt-5">
+                    <button class="btn btn-secondary" id="updateCtIdButton">Update CT.ID</button>
+                    <button class="btn btn-primary" id="printButton">Print</button>
                 </div>
-            </div>
-            <div class="row card-body pt-0">
-                <div class="col-lg-12 col-sm-12 col-md-12">
+                <div class="col-lg-9 col-sm-19 col-md-9">
                     <form action="{{ route('ctid_lc_change') }}" method="post" class="d-flex justify-content-start mt-2">
                         @csrf
                         <div class="container-fluid mt-3">
@@ -52,14 +50,14 @@
                                 <div class="col-lg-3 col-sm-12 col-md-3">
                                     <div class="form-group">
                                         <label class="font-weight-bold">CTD ID</label>
-                                    <select onchange="fetchLogStatus(this.value)" class="js-example-basic-single w-100 select2-hidden-accessible" data-width="100%" name="ci_id" id="ci_id"   >
-                                        <option value="">Select CTD ID</option>
-                                        @if(!empty($ct_ids))
-                                            @foreach($ct_ids as $key => $data)
-                                                <option value="{{ $key }}" >{{ $data }}</option>
-                                            @endforeach
-                                        @endif
-                                    </select>
+                                        <select onchange="fetchLogStatus(this.value)" class="js-example-basic-single w-100 select2-hidden-accessible" data-width="100%" name="ci_id" id="ci_id"   >
+                                            <option value="">Select CTD ID</option>
+                                            @if(!empty($ct_ids))
+                                                @foreach($ct_ids as $key => $data)
+                                                    <option value="{{ $key }}" >{{ $data }}</option>
+                                                @endforeach
+                                            @endif
+                                        </select>
                                     </div>
                                  </div>
                                 <div class="col-lg-3 col-sm-12 col-md-3">
@@ -81,9 +79,7 @@
                         </div>
                     </form>
                 </div>
-            </div>
-
-            <div class="row card-body">
+            
                 <div class="col-lg-12 col-sm-12 col-md-12">
                     <div class="table-responsive">
                         <table id="dataTable" class="table">
@@ -93,8 +89,8 @@
                                 <th>CSDID</th>
                                 <th>MAITOU</th>
                                 <th>BillId</th>
-                                <th>T.Cube</th>
                                 <th>CT ID</th>
+                                <th>T.Cube</th>
                                 <th>Barcode</th>
                                 <th>BY</th>
                                 <th>Log Status</th>
@@ -115,11 +111,10 @@
         </div>
     </div>
 
-    <div id="popup_status"
-    style="display: none; position: absolute; background-color: #f9f9f9; border: 1px solid #ccc; padding: 10px;">
-
-</div>
-
+    <div id="popup_status" style="display: none; position: absolute; background-color: #f9f9f9; border: 1px solid #ccc; padding: 10px;"></div>
+    <div id="popup" style="display:none; position:absolute; background-color:#fff; border:1px solid #ccc; padding:5px;">
+        <p id="popup-content"></p>
+    </div>
         <div class="modal fade" id="productModalUpdateCtId" tabindex="-1" aria-labelledby="productModalLabel"
         aria-hidden="true">
         <div class="modal-dialog custom-width" role="document">
@@ -227,53 +222,55 @@
         $(document).ready(function() {
 
             function startCountdown(startTime, row) {
-        var countdownInterval = setInterval(function () {
-            var currentTime = serverTimeDate;
-            var elapsedTime = currentTime - startTime;
-            var days = Math.floor(elapsedTime / (1000 * 60 * 60 * 24));
-            var hours = Math.floor((elapsedTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            var minutes = Math.floor((elapsedTime % (1000 * 60 * 60)) / (1000 * 60));
-            var seconds = Math.floor((elapsedTime % (1000 * 60)) / 1000);
-            var countdownString = days + "D " + hours.toString().padStart(2, '0') + ":" + minutes.toString().padStart(2, '0') + ":" + seconds.toString().padStart(2, '0');
-            //  console.log(countdownString , row);
-            row.querySelector('.dbttime').textContent = countdownString;
+                var countdownInterval = setInterval(function () {
+                    var currentTime = serverTimeDate;
+                    var elapsedTime = currentTime - startTime;
+                    var days = Math.floor(elapsedTime / (1000 * 60 * 60 * 24));
+                    var hours = Math.floor((elapsedTime % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                    var minutes = Math.floor((elapsedTime % (1000 * 60 * 60)) / (1000 * 60));
+                    var seconds = Math.floor((elapsedTime % (1000 * 60)) / 1000);
+                    var countdownString = days + "D " + hours.toString().padStart(2, '0') + ":" + minutes.toString().padStart(2, '0') + ":" + seconds.toString().padStart(2, '0');
+                    //  console.log(countdownString , row);
+                    row.querySelector('.dbttime').textContent = countdownString;
 
-        }, 1000);
-    }
-function stopWatch()
-  {
-    var rowsForCountDown = document.querySelectorAll('tbody.main-table tr');
-    console.log(rowsForCountDown);
-    rowsForCountDown.forEach(function (row, index) {
-        var startTime = row.querySelector('.dbttime');
-
-        if (startTime != null) {
-            var startTimeStr = startTime.textContent;
-            if (startTimeStr.startsWith('Started:')) {
-
-                var startTime = new Date(startTimeStr.replace('Started: ', ''));
-
-
-                startCountdown(startTime, row);
+                }, 1000);
             }
-        }
 
-    });
-  }
 
-           var table = $('#dataTable').DataTable({
-                "pageLength": 50,
-                "lengthMenu": [[50, 100, 150, 200, -1], [50, 100, 150, 200, "All"]],
-                processing: true,
-                serverSide: true,
-                ajax: '{{ route("repackProductsData") }}',
-                'fnRowCallback': function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
-                    let checkbox = 'unchecked';
-                    if ($('#checkAll').prop('checked')) {
-    checkbox = 'checked'
-} else {
-    checkbox = 'unchecked';
-}
+                function stopWatch()
+                {
+                    var rowsForCountDown = document.querySelectorAll('tbody.main-table tr');
+                    console.log(rowsForCountDown);
+                    rowsForCountDown.forEach(function (row, index) {
+                        var startTime = row.querySelector('.dbttime');
+
+                        if (startTime != null) {
+                            var startTimeStr = startTime.textContent;
+                            if (startTimeStr.startsWith('Started:')) {
+
+                                var startTime = new Date(startTimeStr.replace('Started: ', ''));
+
+
+                                startCountdown(startTime, row);
+                            }
+                        }
+
+                    });
+                }
+
+                        var table = $('#dataTable').DataTable({
+                                "pageLength": 50,
+                                "lengthMenu": [[50, 100, 150, 200, -1], [50, 100, 150, 200, "All"]],
+                                processing: true,
+                                serverSide: true,
+                                ajax: '{{ route("repackProductsData") }}',
+                                'fnRowCallback': function(nRow, aData, iDisplayIndex, iDisplayIndexFull) {
+                                    let checkbox = 'unchecked';
+                                    if ($('#checkAll').prop('checked')) {
+                    checkbox = 'checked'
+                } else {
+                    checkbox = 'unchecked';
+                }
                     $(nRow).find("input[type=checkbox]").prop(checkbox, aData.checkbox);
 
                     $(nRow).find('td:last').prev('td').hide();
@@ -282,9 +279,26 @@ function stopWatch()
                     { data: 'checkbox', name: 'checkbox' },
                     { data: 'csd_id', name: 'csd_id' },
                     { data: 'maitou', name: 'maitou' },
-                    { data: 'bill_id', name: 'bill_id'},
-                    { data: 't_cube', name: 't_cube'},
+
+
+                    {
+                        data: 'bill_id',
+                        name: 'bill_id',
+                        render: function(data, type, full, meta) {
+                            // Assuming your route for viewing bill details is named 'bill.view'
+                            if (data) {
+                                var url =
+                                    '{{ route('products.index', ['bill_id' => 'BillParam']) }}';
+                                url = url.replace('BillParam', data);
+                                return '<a href="' + url + '">' + data + '</a>';
+                            } else {
+                                return '';
+                            }
+
+                        }
+                    },
                     { data: 'ct_id', name: 'ct_id'},
+                    { data: 't_cube', name: 't_cube'},
                     { data: 'sku', name: 'sku'},
                     { data: 'option', name: 'option',
                         render: function(data, type, full, meta) {
@@ -591,16 +605,13 @@ function stopWatch()
                 // Adding option based on product.log_status value
                 var statusOption = document.createElement('option');
                 statusOption.value = product.log_status;
-                statusOption.textContent = product
-                    .log_status; // You may want to change this to something more descriptive
+                statusOption.textContent = product.log_status; // You may want to change this to something more descriptive
                 statusOption.selected = true; // Select the option if it matches the log_status
                 logStatusSelect.appendChild(statusOption);
 
                 logStatusCell.appendChild(logStatusSelect);
                 row.appendChild(logStatusCell);
-
-
-
+                
                 // lc
                 var lcCell = document.createElement('td');
                 var lcSelect = document.createElement('select');
@@ -614,6 +625,13 @@ function stopWatch()
                 defaultOption.selected = product.lc == '' || product.lc == null;
                 lcSelect.appendChild(defaultOption);
 
+                // Adding option based on product.log_status value
+                var clOption = document.createElement('option');
+                clOption.value = product.lc;
+                clOption.textContent = product.lc; // You may want to change this to something more descriptive
+                clOption.selected = true; // Select the option if it matches the log_status
+                lcSelect.appendChild(clOption);
+                console.log("comes");
                 // Creating options for lc
                 var lcOptions = ['ABC14', 'ABC15', 'ABC16', 'ABC17', 'ABC18'];
                 lcOptions.forEach(function(optionValue) {
@@ -700,7 +718,7 @@ function stopWatch()
                 var dbtCell = document.createElement('td');
                 if (product.dbt === '' || product.dbt === null) {
                     var dbtButton = document.createElement('button');
-                    dbtButton.classList.add('editable-dbt');
+                    dbtButton.classList.add('btn btn-primary editable-dbt');
                     dbtButton.dataset.id = '{{ $product->id }}';
                     dbtButton.textContent = 'Start';
                     dbtCell.appendChild(dbtButton);
@@ -854,18 +872,82 @@ function stopWatch()
             $("#popup_status").css("display", "none");
         }
 
-// Event listener for dynamically generated elements
-$(document).on('mouseenter', '.editable-log_status', function(event) {
 
-var description = $(this).find('option:selected').attr('data-description');
-var x = event.clientX;
-var y = event.clientY;
+        // Event listener for dynamically generated elements
+        $(document).on('mouseenter', '.editable-log_status', function(event) {
 
-console.log(x,y)
-showPopup(x, y, description);
-}).on('mouseleave', '.editable-log_status', function() {
-hidePopup();
-});
+            var description = $(this).find('option:selected').attr('data-description');
+            var x = event.clientX;
+            var y = event.clientY;
+
+            console.log(x,y)
+            showPopup(x, y, description);
+            }).on('mouseleave', '.editable-log_status', function() {
+            hidePopup();
+        });
+        
+        // Function to show popup
+        function showPopupLc(x, y, description) {
+
+            $('#popup').css({ top: y + 10, left: x + 10 }).show();
+            $('#popup-content').text(description);
+        }
+
+        // Function to hide popup
+        function hidePopupLc() {
+            $('#popup').hide();
+        }
+
+        // Event listener for hover
+        $(document).on('mouseenter', '.editable-lc, .editable-cost, .editable-ntf_cs', function(event) {
+            var $select = $(this);
+            var description = $select.find('option:selected').attr('data-description');
+            var x = event.clientX;
+            var y = event.clientY;
+            if(description !== "N/A"){
+                // Disable the drop-down and change its color
+                $select.prop('disabled', true);
+                $select.addClass('disabled-dropdown'); // Apply the disabled class
+                showPopupLc(x, y, description);
+            }
+            
+        }).on('mouseleave', '.editable-lc', function() {
+            hidePopupLc();
+        });
+
+       
+
+
+        // Event listener for change
+        $(document).on('change', '.editable-lc, .editable-cost, .editable-ntf_cs', function() {
+            var $select = $(this); // The <select> element that triggered the event
+            var id = $select.data('id'); // Get the ID from data-id
+            var selectedValue = $select.val(); // Get the selected value
+            var classNameString = $(this).attr('class');
+            var loggedInUserId = @json(auth()->id());
+            var userId = loggedInUserId; // Ensure loggedInUserId is defined and holds the user ID
+
+            $.ajax({
+                url: '/update-option/' + id,
+                method: 'POST',
+                data: {
+                    _token: $('meta[name="csrf-token"]').attr('content'),
+                    new_option: selectedValue, // Send the new option value
+                    user_id: userId, // Send the user ID
+                    className:classNameString
+                },
+                success: function(response) {
+                    // Disable the drop-down and change its color
+                    $select.prop('disabled', true);
+                    $select.addClass('disabled-dropdown'); // Apply the disabled class
+                },
+                error: function(xhr) {
+                    // Handle error
+                    console.error('An error occurred:', xhr.responseText);
+                    alert('An error occurred while updating the option.');
+                }
+            });
+        });
 
 
 
